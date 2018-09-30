@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="pragma" content="no-cache">
+    <title>将网页更改成图片</title>
+    <style>
+        html, body, div, span, applet, object, iframe, h1, h2, h3,    
+        h4, h5, h6, p, blockquote, pre, a, abbr, acronym,    
+        address, big, cite, code, del, dfn, em, img, ins,    
+        kbd, q, s, samp, small, strike, strong, sub, sup, tt,    
+        var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend,    
+        table, caption, tbody, tfoot, thead, tr, th, td {    
+            margin: 0;    
+            padding: 0;    
+            border: 0;    
+            outline: 0;    
+            font-weight: inherit;    
+            font-style: inherit;    
+            font-size: .373333rem;    
+            font-family: "Hiragino Sans GB","黑体","Roboto","Noto","Arial","Microsoft YaHei","宋体",sans-serif;
+            color: #4A4A4A;    
+            vertical-align: baselinebaseline;    
+        }    
+        /* 自定义弹框 */
+        .mask{
+            position:fixed;
+			top:0;
+			left:0;
+			width: 100%;
+			height: 100%;
+			overflow:hidden;
+			z-index:100;
+			display:none;
+			background: rgba(0, 0, 0, 0.3);
+		}
+		.popup{
+			width:8rem;
+			height:10.066667rem;
+			position:absolute;
+			margin:auto;
+			top:0;
+			bottom:0;
+			left:0;
+			right:0;
+			background:#fff;
+			z-index:100;
+			display: none;
+            padding:.4rem .213333rem;
+            border-radius:0.9333rem;
+		}
+		@keyframes zoomIn {
+			from {
+				opacity: 0;
+				transform: scale3d(0.3, 0.3, 0.3);
+			}
+			50% {
+				opacity: 1;
+			}
+		}
+		.popup.main {
+			animation: zoomIn 0.3s;
+			display: flex;
+			flex-wrap: wrap;
+			opacity: 1;
+		}
+        .popup>canvas{
+            width: 100% !important;
+            /* height: 100%; */
+        }
+        /* 内容样式 */
+        .canvas_box .tit_img{
+            width: 100%;
+            height: 3.333333rem;
+            background:red;
+        }
+        .canvas_box .title{
+            text-align:center;
+            font-size:.533333rem;
+        }
+        .tit-content{
+            font-size:.48rem;
+            background:blue;
+        }
+    </style>
+</head>
+<body>
+    <!-- 内容截图区域 -->
+    <div id="content" class="canvas_box">
+        <div class="tit_img">
+            
+        </div>
+        <p class="title">
+            <span class="title-tit">特权说明</span>
+        </p>
+        <p class="tit-content"  id="content">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis laudantium, sint et ipsam laboriosam amet ex tempore sequi ullam at necessitatibus quasi asperiores. Quaerat in eius labore ab quibusdam. Harum.
+        </p>
+    </div>
+
+    <div style="margin-top:200px;text-align: center;">
+        <button>截图</button>
+    </div>
+    <!-- 弹出层 -->
+    <div class="mask" id="mask"></div>
+    <div class="popup" id="popup">
+        <canvas id="thecanvas" width="100" height="100"></canvas>
+        <div id="Download">下载</div>
+    </div>
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="bower_components/html2canvas/html2canvas.min.js"></script>
+    <script src="bower_components/flexible/flexible.js"></script>
+    <script src="bower_components/base64js.min.js"></script>
+    <script src="bower_components/canvas2image.js"></script>
+    <script>
+        var canvas = document.querySelector("canvas");
+        var ctx = canvas.getContext("2d");
+        var ctx = canvas.getContext('2d');
+        ctx.beginPath();
+        ctx.arc(75,75,50,0,Math.PI*2,true); // Outer circle
+        ctx.moveTo(110,75);
+        ctx.arc(75,75,35,0,Math.PI,false);   // Mouth (clockwise)
+        ctx.moveTo(65,65);
+        ctx.arc(60,65,5,0,Math.PI*2,true);  // Left eye
+        ctx.moveTo(95,65);
+        ctx.arc(90,65,5,0,Math.PI*2,true);  // Right eye
+        ctx.stroke();
+        document.querySelector("button").addEventListener("click", function() {
+            html2canvas(document.querySelector("#content"), {canvas: canvas}).then(function(canvas) {
+                document.getElementById("mask").style.cssText = 'display:block';
+                document.getElementById("popup").style.cssText = 'display:block';
+                $(".popup").addClass('main')
+            });
+        }, false);
+
+        var Download = document.getElementById("Download");
+        Download.onclick = function(){
+            var oCanvas = document.getElementById("thecanvas");
+        
+            /*自动保存为png*/
+            // 获取图片资源
+            var img_data1 = Canvas2Image.saveAsPNG(oCanvas, true).getAttribute('src');
+            saveFile(img_data1, 'richer.png');
+        
+        
+            /*下面的为原生的保存，不带格式名*/
+            // 这将会提示用户保存PNG图片
+            // Canvas2Image.saveAsPNG(oCanvas);
+        }
+        // 保存文件函数
+        var saveFile = function(data, filename){
+            var dowload_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+            dowload_link.href = data;
+            dowload_link.download = filename;
+            var event = document.createEvent('MouseEvents');
+            event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            dowload_link.dispatchEvent(event);
+        }
+    </script>
+</body>
+</html>
